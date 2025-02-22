@@ -17,7 +17,9 @@ export default function TaskCard({ task }) {
   const desRef = useRef(null);
   const { mutate: deleteTask, isPending } = useMutation({
     mutationFn: async (taskId) => {
-      return await axios.delete(`http://localhost:3000/api/tasks/${taskId}`);
+      return await axios.delete(
+        `https://tasker-psi-six.vercel.app/api/tasks/${taskId}`
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
@@ -28,7 +30,7 @@ export default function TaskCard({ task }) {
   const { mutate: editTask, isPending: editing } = useMutation({
     mutationFn: async ({ _id, editedTask }) => {
       return await axios.patch(
-        `http://localhost:3000/api/tasks/${_id}`,
+        `https://tasker-psi-six.vercel.app/api/tasks/${_id}`,
         editedTask
       );
     },

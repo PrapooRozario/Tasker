@@ -21,7 +21,9 @@ export default function Page() {
   } = useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const { data } = await axios.get("http://localhost:3000/api/tasks");
+      const { data } = await axios.get(
+        "https://tasker-psi-six.vercel.app/api/tasks"
+      );
       return data;
     },
   });
@@ -46,7 +48,7 @@ export default function Page() {
     setTasks(updatedTasks);
 
     axios
-      .put(`http://localhost:3000/api/tasks/${draggedTaskId}`, {
+      .put(`https://tasker-psi-six.vercel.app/api/tasks/${draggedTaskId}`, {
         category: newCategory,
       })
       .then(() => {

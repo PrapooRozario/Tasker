@@ -18,7 +18,7 @@ export default function Navbar() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (task) =>
-      axios.post("http://localhost:3000/api/tasks", { task }),
+      axios.post("https://tasker-psi-six.vercel.app/api/tasks", { task }),
     onSuccess: () =>
       toast.success(
         "Task Added Successfully",
