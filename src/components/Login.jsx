@@ -14,11 +14,13 @@ import { useContext, useState } from "react";
 import { AuthContext } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export function Login({ className, ...props }) {
   const { signIn, googleAuth, resetPassword } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -29,6 +31,7 @@ export function Login({ className, ...props }) {
     try {
       await signIn(email, password);
       toast.success("Welcome Back! Login Successful.");
+      router.push("/");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -39,8 +42,13 @@ export function Login({ className, ...props }) {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      await googleAuth();
+      const { user } = await googleAuth();
+      await axios.put("https://tasker-psi-six.vercel.app/api/users", {
+        username: user.displayName,
+        email: user.email,
+      });
       toast.success(" Google Login Successful!");
+      router.push("/");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -76,7 +84,7 @@ export function Login({ className, ...props }) {
                     fill="currentColor"
                   />
                 </svg>
-               Login with Google
+                Login with Google
               </Button>
 
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
@@ -116,8 +124,13 @@ export function Login({ className, ...props }) {
                   />
                 </div>
 
-                <Button type="submit" variant='primary' className="w-full" disabled={loading}>
-              Login
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Sign Up"}
                 </Button>
               </div>
 

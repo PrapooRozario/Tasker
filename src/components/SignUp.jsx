@@ -14,9 +14,12 @@ import { useContext, useState } from "react";
 import { AuthContext } from "@/contexts/AuthProvider";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export function SignUp({ className, ...props }) {
-  const { signUp, googleAuth } = useContext(AuthContext);
+  const { signUp, googleAuth, setUser } = useContext(AuthContext);
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async (e) => {
@@ -27,13 +30,36 @@ export function SignUp({ className, ...props }) {
     const email = e.target.email.value;
     const password = e.target.password.value;
 
+    const user = { username, email, password };
     try {
       const res = await signUp(email, password);
+      setUser(res.user);
+
+      await axios.put("https://tasker-psi-six.vercel.app/api/users", user);
+
       toast.success(`Welcome, ${username}!`);
+      router.push("/");
     } catch (err) {
       toast.error(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    try {
+      const res = await googleAuth();
+      const user = res?.user;
+      setUser(user);
+      await axios.put("https://tasker-psi-six.vercel.app/api/users", {
+        username: user.displayName,
+        email: user.email,
+      });
+
+      toast.success(`Signed up with Google! Welcome, ${user.displayName}!`);
+      router.push("/");
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
@@ -50,13 +76,10 @@ export function SignUp({ className, ...props }) {
           <form onSubmit={handleSignUp}>
             <div className="grid gap-6">
               <Button
-                onClick={() =>
-                  googleAuth()
-                    .then(() => toast.success("Signed up with Google!"))
-                    .catch((err) => toast.error(err.message))
-                }
+                onClick={handleGoogleAuth}
                 variant="outline"
                 type="button"
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-2"
               >
                 <svg
@@ -119,7 +142,7 @@ export function SignUp({ className, ...props }) {
                   className="w-full"
                   disabled={loading}
                 >
-                  Sign Up
+                  {loading ? "Signing Up..." : "Sign Up"}
                 </Button>
               </div>
 
